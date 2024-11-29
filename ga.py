@@ -47,8 +47,8 @@ def crossover(parent1, parent2):
     return child1, child2
 
 
-def mutation(individual, mutation_threshold=0.9):
-    if random.random() > mutation_threshold:
+def mutation(individual, mutation_probability):
+    if random.random() <= mutation_probability:
         start = random.randint(1, len(individual) - 1)
         end = random.randint(start, len(individual) - 1)
         tmp = individual[start:end + 1]
@@ -58,7 +58,7 @@ def mutation(individual, mutation_threshold=0.9):
     return individual
 
 
-def genetic_algorithm(data, population_size, num_iterations):
+def genetic_algorithm(data, population_size, num_iterations, mutation_probability):
     population = initial_population(data=data, population_size=population_size)
     for _ in range(num_iterations):
         new_population_size = len(population) - 2
@@ -70,15 +70,17 @@ def genetic_algorithm(data, population_size, num_iterations):
             parent1, parent2 = random.sample(population, 2)
             child1, child2 = crossover(parent1, parent2)
 
-            child1 = mutation(child1)
-            child2 = mutation(child2)
+            child1 = mutation(child1, mutation_probability)
+            child2 = mutation(child2, mutation_probability)
 
             new_population.append(child1)
             new_population.append(child2)
 
         population = new_population
 
-    return population
+    best_path = min(population, key=lambda x: fitness_function(x))
+    best_fitness_value = fitness_function(best_path)
+    return best_path, best_fitness_value
 
 
 def plot(path):
@@ -101,6 +103,7 @@ def parse_arg():
     args = ArgumentParser()
     args.add_argument('--data', type=str, required=True, help='Data.')
     args.add_argument('--population-size', type=int, default=800, help='Population size.')
+    args.add_argument('--mutation-probability', type=float, default=0.1, help='Mutation probability.')
     args.add_argument('--num-iterations', type=int, default=100, help='Number of iterations.')
     args.add_argument('--seed', type=int, default=33, help='Random seed.')
     args.add_argument('--plot-result', action='store_true', help='Plot the result.')
@@ -112,12 +115,13 @@ if __name__ == '__main__':
 
     random.seed(args.seed)
 
-    population = genetic_algorithm(data=eval(args.data),
-                                   population_size=args.population_size,
-                                   num_iterations=args.num_iterations)
-    best_path = min(population, key=lambda x: fitness_function(x))
+    best_path, best_fitness_value = genetic_algorithm(data=eval(args.data),
+                                                      population_size=args.population_size,
+                                                      mutation_probability=args.mutation_probability,
+                                                      num_iterations=args.num_iterations, )
+
     print(f'The best path: {best_path}')
-    print(f'The fitness value: {fitness_function(best_path)}')
+    print(f'The fitness value: {best_fitness_value}')
 
     if args.plot_result:
         plot(best_path)

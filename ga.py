@@ -26,13 +26,6 @@ def selection(population, new_population_size):
     return sorted(population, key=lambda x: fitness_function(x))[:new_population_size]
 
 
-def swap(a, b):
-    tmp = a
-    a = b
-    b = tmp
-    return a, b
-
-
 def crossover(parent1, parent2):
     child1 = parent1.copy()
     child2 = parent2.copy()

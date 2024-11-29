@@ -15,11 +15,7 @@ def fitness_function(path):
 def initial_population(data, population_size):
     population = []
     for _ in range(population_size):
-        individual = []
-        for j in range(len(data)):
-            individual.append(data[j])
-        random.shuffle(individual)
-
+        individual = random.sample(data, len(data))
         if individual not in population:
             population.append(individual)
 
@@ -111,7 +107,7 @@ if __name__ == '__main__':
     data = [(0, 1), (1, 0), (2, 0), (11, 10), (22, 23), (33, 35), (15, 13), (20, 3)]
 
     random.seed(33)
-    population = genetic_algorithm(data=data, population_size=800, num_iterations=300)
+    population = genetic_algorithm(data=data, population_size=800, num_iterations=100)
     best_path = min(population, key=lambda x: fitness_function(x))
     print(f'The best path: {best_path}')
     print(f'The fitness value: {fitness_function(best_path)}')

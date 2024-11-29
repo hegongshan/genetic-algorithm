@@ -103,6 +103,7 @@ def parse_arg():
     args.add_argument('--population-size', type=int, default=800, help='Population size.')
     args.add_argument('--num-iterations', type=int, default=100, help='Number of iterations.')
     args.add_argument('--seed', type=int, default=33, help='Random seed.')
+    args.add_argument('--plot-result', action='store_true', help='Plot the result.')
     return args.parse_args()
 
 
@@ -117,4 +118,6 @@ if __name__ == '__main__':
     best_path = min(population, key=lambda x: fitness_function(x))
     print(f'The best path: {best_path}')
     print(f'The fitness value: {fitness_function(best_path)}')
-    plot(best_path)
+
+    if args.plot_result:
+        plot(best_path)

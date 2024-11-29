@@ -1,5 +1,6 @@
 import math
 import random
+from argparse import ArgumentParser
 
 
 def fitness_function(path):
@@ -58,7 +59,7 @@ def mutation(individual, mutation_threshold=0.9):
 
 
 def genetic_algorithm(data, population_size, num_iterations):
-    population = initial_population(population_size=population_size, data=data)
+    population = initial_population(data=data, population_size=population_size)
     for _ in range(num_iterations):
         new_population_size = len(population) - 2
         population = selection(population=population, new_population_size=new_population_size)
@@ -96,11 +97,23 @@ def plot(path):
     plt.show()
 
 
-if __name__ == '__main__':
-    data = [(0, 1), (1, 0), (2, 0), (11, 10), (22, 23), (33, 35), (15, 13), (20, 3)]
+def parse_arg():
+    args = ArgumentParser()
+    args.add_argument('--data', type=str, required=True, help='Data.')
+    args.add_argument('--population-size', type=int, default=800, help='Population size.')
+    args.add_argument('--num-iterations', type=int, default=100, help='Number of iterations.')
+    args.add_argument('--seed', type=int, default=33, help='Random seed.')
+    return args.parse_args()
 
-    random.seed(33)
-    population = genetic_algorithm(data=data, population_size=800, num_iterations=100)
+
+if __name__ == '__main__':
+    args = parse_arg()
+
+    random.seed(args.seed)
+
+    population = genetic_algorithm(data=eval(args.data),
+                                   population_size=args.population_size,
+                                   num_iterations=args.num_iterations)
     best_path = min(population, key=lambda x: fitness_function(x))
     print(f'The best path: {best_path}')
     print(f'The fitness value: {fitness_function(best_path)}')

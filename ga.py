@@ -27,7 +27,10 @@ def selection(population, new_population_size):
     return sorted(population, key=lambda x: fitness_function(x))[:new_population_size]
 
 
-def crossover(parent1, parent2):
+def crossover(parent1, parent2, crossover_rate):
+    if random.random() >= crossover_rate:
+        return parent1, parent2
+
     child1 = parent1.copy()
     child2 = parent2.copy()
 
@@ -47,8 +50,8 @@ def crossover(parent1, parent2):
     return child1, child2
 
 
-def mutation(individual, mutation_probability):
-    if random.random() <= mutation_probability:
+def mutation(individual, mutation_rate):
+    if random.random() < mutation_rate:
         start = random.randint(1, len(individual) - 1)
         end = random.randint(start, len(individual) - 1)
         tmp = individual[start:end + 1]
@@ -58,7 +61,7 @@ def mutation(individual, mutation_probability):
     return individual
 
 
-def genetic_algorithm(data, population_size, num_iterations, mutation_probability):
+def genetic_algorithm(data, population_size, num_iterations, crossover_rate, mutation_rate):
     population = initial_population(data=data, population_size=population_size)
     for _ in range(num_iterations):
         new_population_size = len(population) - 2
@@ -68,10 +71,10 @@ def genetic_algorithm(data, population_size, num_iterations, mutation_probabilit
 
         while len(new_population) < new_population_size:
             parent1, parent2 = random.sample(population, 2)
-            child1, child2 = crossover(parent1, parent2)
+            child1, child2 = crossover(parent1, parent2, crossover_rate)
 
-            child1 = mutation(child1, mutation_probability)
-            child2 = mutation(child2, mutation_probability)
+            child1 = mutation(child1, mutation_rate)
+            child2 = mutation(child2, mutation_rate)
 
             new_population.append(child1)
             new_population.append(child2)
@@ -103,7 +106,8 @@ def parse_arg():
     args = ArgumentParser()
     args.add_argument('--data', type=str, required=True, help='Data.')
     args.add_argument('--population-size', type=int, default=800, help='Population size.')
-    args.add_argument('--mutation-probability', type=float, default=0.1, help='Mutation probability.')
+    args.add_argument('--crossover-rate', type=float, default=0.1, help='Crossover rate.')
+    args.add_argument('--mutation-rate', type=float, default=0.1, help='Mutation rate.')
     args.add_argument('--num-iterations', type=int, default=100, help='Number of iterations.')
     args.add_argument('--seed', type=int, default=33, help='Random seed.')
     args.add_argument('--plot-result', action='store_true', help='Plot the result.')
@@ -117,7 +121,8 @@ if __name__ == '__main__':
 
     best_path, best_fitness_value = genetic_algorithm(data=eval(args.data),
                                                       population_size=args.population_size,
-                                                      mutation_probability=args.mutation_probability,
+                                                      crossover_rate=args.crossover_rate,
+                                                      mutation_rate=args.mutation_rate,
                                                       num_iterations=args.num_iterations, )
 
     print(f'The best path: {best_path}')

@@ -12,6 +12,7 @@ Example:
 $ python3 ga.py \
   --data '[(0, 1), (1, 0), (2, 0), (11, 10), (22, 23), (33, 35), (15, 13), (20, 3)]' \
   --population-size 800 \
+  --selection-operator 'sort' \
   --crossover-rate 0.1 \
   --mutation-rate 0.1 \
   --num-iterations 200 \

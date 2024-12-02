@@ -2,6 +2,8 @@ import math
 import random
 from argparse import ArgumentParser
 
+from selection import sort_selection, roulette_wheel_selection
+
 
 def fitness_function(path):
     total = 0
@@ -23,8 +25,14 @@ def initial_population(data, population_size):
     return population
 
 
-def selection(population, new_population_size):
-    return sorted(population, key=lambda x: fitness_function(x))[:new_population_size]
+def selection(population, new_population_size, operator):
+    if operator == 'sort':
+        return sort_selection(population, new_population_size, fitness_function)
+    if operator == 'roulette_wheel':
+        return roulette_wheel_selection(population, new_population_size, fitness_function)
+
+    print(f'Unsupported selection operator: {operator}')
+    exit()
 
 
 def crossover(parent1, parent2, crossover_rate):
@@ -61,11 +69,11 @@ def mutation(individual, mutation_rate):
     return individual
 
 
-def genetic_algorithm(data, population_size, num_iterations, crossover_rate, mutation_rate):
+def genetic_algorithm(data, population_size, num_iterations, selection_operator, crossover_rate, mutation_rate):
     population = initial_population(data=data, population_size=population_size)
     for _ in range(num_iterations):
         new_population_size = len(population) - 2
-        population = selection(population=population, new_population_size=new_population_size)
+        population = selection(population=population, new_population_size=new_population_size, operator=selection_operator)
 
         new_population = []
 
@@ -106,6 +114,7 @@ def parse_arg():
     args = ArgumentParser()
     args.add_argument('--data', type=str, required=True, help='Data.')
     args.add_argument('--population-size', type=int, default=800, help='Population size.')
+    args.add_argument('--selection-operator', type=str, default='sort', help='sort|roulette_wheel')
     args.add_argument('--crossover-rate', type=float, default=0.1, help='Crossover rate.')
     args.add_argument('--mutation-rate', type=float, default=0.1, help='Mutation rate.')
     args.add_argument('--num-iterations', type=int, default=100, help='Number of iterations.')
@@ -121,6 +130,7 @@ if __name__ == '__main__':
 
     best_path, best_fitness_value = genetic_algorithm(data=eval(args.data),
                                                       population_size=args.population_size,
+                                                      selection_operator=args.selection_operator,
                                                       crossover_rate=args.crossover_rate,
                                                       mutation_rate=args.mutation_rate,
                                                       num_iterations=args.num_iterations, )

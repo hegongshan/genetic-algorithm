@@ -6,6 +6,8 @@ def sort_selection(population, new_population_size, fitness_function):
 
 
 def roulette_wheel_selection(population, new_population_size, fitness_function):
-    weights = [fitness_function(individual) for individual in population]
-    x = random.choices(population, weights, k=new_population_size)
-    return x
+    fitness_values = [fitness_function(individual) for individual in population]
+    fitness_value_sum = sum(fitness_values)
+
+    weights = [fitness_value / fitness_value_sum for fitness_value in fitness_values]
+    return random.choices(population, weights, k=new_population_size)
